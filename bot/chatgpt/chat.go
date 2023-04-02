@@ -23,6 +23,7 @@ type ChatGPTConversion struct {
 	client    *openai.Client
 	requst    *Request
 	busy      chan struct{}
+	proxy     string
 }
 
 func NewChatGPTConversion(secretKey string) *ChatGPTConversion {
@@ -47,6 +48,7 @@ func (chat *ChatGPTConversion) SetProxy(proxy string) error {
 	if err := chat.setHttpProxy(proxy); err != nil {
 		return err
 	}
+	chat.proxy = proxy
 	return nil
 }
 
@@ -188,5 +190,34 @@ func (chat *ChatGPTConversion) Ask(ctx context.Context, prompt string, callback 
 			callback(params.NewCallParams(msgId, parentId, chunk, text, params.BotTypeChatGPT, false, chunkIndex), err)
 		}
 	}
+	return nil
+}
+
+func (chat *ChatGPTConversion) RefreshProxy(proxy string) error {
+	if chat.proxy == proxy {
+		return nil
+	}
+	if proxy == "" {
+		chat.botConfig.HTTPClient = &http.Client{}
+		chat.proxy = proxy
+		return nil
+	}
+	if err := chat.SetProxy(proxy); err != nil {
+		return err
+	}
+	chat.client = openai.NewClientWithConfig(chat.botConfig)
+	return nil
+}
+
+func (chat *ChatGPTConversion) RefreshSecretKey(secretKey string) error {
+	if chat.secretKey == secretKey {
+		return nil
+	}
+	chat.botConfig = openai.DefaultConfig(secretKey)
+	err := chat.SetProxy(chat.proxy)
+	if err != nil {
+		return err
+	}
+	chat.client = openai.NewClientWithConfig(chat.botConfig)
 	return nil
 }
