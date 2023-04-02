@@ -14,6 +14,8 @@ type Conversation interface {
 	SetBaseURL(baseURL string)
 	SetSystemMsg(content string)
 	Ask(ctx context.Context, prompt string, callback func(params *params.CallParams, err error)) (err error)
+	RefreshProxy(proxy string) error
+	RefreshSecretKey(secretKey string) error
 }
 
 type Bot struct {
@@ -63,6 +65,16 @@ func (bot *Bot) Ask(ctx context.Context, askParams *params.AskParams) error {
 	if err != nil {
 		return err
 
+	}
+	if askParams.RefreshProxy {
+		if err = conversation.RefreshProxy(askParams.Proxy); err != nil {
+			return err
+		}
+	}
+	if askParams.RefreshSecretKey {
+		if err = conversation.RefreshSecretKey(askParams.SecretKey); err != nil {
+			return err
+		}
 	}
 	err = conversation.Ask(ctx, askParams.Prompt, askParams.Callback)
 	if err != nil {
