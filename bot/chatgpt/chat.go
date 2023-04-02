@@ -157,19 +157,21 @@ func (chat *ChatGPTConversion) Ask(ctx context.Context, prompt string, callback 
 	defer stream.Close()
 
 	var text string
+	var chunkIndex int
 	for {
+		chunkIndex += 1
 		var response openai.ChatCompletionStreamResponse
 		response, err = stream.Recv()
 		if errors.Is(err, io.EOF) {
 			if callback != nil {
-				callback(params.NewCallParams(msgId, parentId, "", text, params.BotTypeChatGPT, true), nil)
+				callback(params.NewCallParams(msgId, parentId, "", text, params.BotTypeChatGPT, true, chunkIndex), nil)
 			}
 			return nil
 		}
 		if err != nil {
 			log.Println("stream error: ", err)
 			if callback != nil {
-				callback(params.NewCallParams(msgId, parentId, "", text, params.BotTypeChatGPT, true), err)
+				callback(params.NewCallParams(msgId, parentId, "", text, params.BotTypeChatGPT, true, chunkIndex), err)
 			}
 			return
 		}
@@ -178,12 +180,12 @@ func (chat *ChatGPTConversion) Ask(ctx context.Context, prompt string, callback 
 		if response.Choices[0].FinishReason != "" {
 			chat.requst.SetResStream(msgId, text, &response)
 			if callback != nil {
-				callback(params.NewCallParams(msgId, parentId, chunk, text, params.BotTypeChatGPT, true), nil)
+				callback(params.NewCallParams(msgId, parentId, chunk, text, params.BotTypeChatGPT, true, chunkIndex), nil)
 			}
 			break
 		}
 		if callback != nil {
-			callback(params.NewCallParams(msgId, parentId, chunk, text, params.BotTypeChatGPT, false), err)
+			callback(params.NewCallParams(msgId, parentId, chunk, text, params.BotTypeChatGPT, false, chunkIndex), err)
 		}
 	}
 	return nil
