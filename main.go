@@ -47,7 +47,7 @@ func main() {
 				ConversationId:    coversationId,
 				Prompt:            prompt,
 				Callback:          callback,
-				BotType:           params.BotTypeChatGPT,
+				ChatEngine:        params.ChatGPT,
 				SystemRoleMessage: sysMessage,
 			},
 		)

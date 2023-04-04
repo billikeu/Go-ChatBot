@@ -35,7 +35,7 @@ func (bot *Bot) GetConversation(askParams *params.AskParams) (Conversation, erro
 	if len(askParams.ConversationId) < 16 {
 		return nil, errors.New("session must more 16 letters")
 	}
-	if askParams.BotType == params.BotTypeChatGPT {
+	if askParams.ChatEngine == params.ChatGPT {
 		conversation := bot.chatgptConversations[askParams.ConversationId]
 		if conversation != nil {
 			return conversation, nil
