@@ -122,14 +122,14 @@ mybot := bot.NewBot(&bot.Config{
 bot.Ask
 
 ```go
-// params.ChatGPT
+// params.NewBingUnofficial
 err := mybot.Ask(
 	context.Background(),
 	&params.AskParams{
 		ConversationId:    coversationId,
 		Prompt:            prompt,
 		Callback:          callback,
-		ChatEngine:        params.ChatGPT, // params.ChatGPT params.NewBingUnofficial
+		ChatEngine:        params.NewBingUnofficial, // params.ChatGPT params.NewBingUnofficial
 		SystemRoleMessage: sysMessage,
 	},
 )
