@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	bingunofficial "github.com/billikeu/Go-ChatBot/bot/bingUnofficial"
@@ -51,6 +52,18 @@ func (bot *Bot) GetConversation(askParams *params.AskParams) (Conversation, erro
 	case params.ChatGPTUnofficial:
 		conversation = chatgptunofficial.NewChatGPTUnofficial()
 	case params.NewBingUnofficial:
+		if askParams.RefreshProxy {
+			bot.config.BingUnofficialConfig.Proxy = askParams.Proxy
+		}
+		if askParams.RefreshSecretKey {
+			cookies := []map[string]interface{}{}
+			err := json.Unmarshal([]byte(askParams.SecretKey), &cookies)
+			if err != nil {
+				return nil, err
+			}
+			bot.config.BingUnofficialConfig.CookiesJson = askParams.SecretKey
+			bot.config.BingUnofficialConfig.Cookies = cookies
+		}
 		conversation = bingunofficial.NewBingChatUnofficial(bot.config.BingUnofficialConfig)
 	default:
 		return nil, errors.New("unimplemented interface")
