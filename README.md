@@ -3,13 +3,20 @@
 
 `Go-ChatBot` is a Golang-based chatbot framework that allows developers to quickly create their own chatbots with just a few lines of code. It supports various engines including `ChatGPT`, `Bing`, and `Bard`.
 
+## Plan
+
+- [x] ChatGPT
+- [ ] ChatGPT Unofficial
+- [x] Bing Unofficial
+- [ ] Bard
+
 ## Setup
 
 ```
 go get -u github.com/billikeu/Go-ChatBot
 ```
 
-## Demo
+## ChatGPT Demo
 
 ```golang
 
@@ -92,12 +99,41 @@ questions: 你是ChatGPT吗
 answer:  不好意思，我不是 ChatGPT，我是 Go-ChatBot。（I'm sorry, I'm not ChatGPT, I'm Go-ChatBot.）
 ```
 
-## Plan
+## Bing Unofficial Demo
 
-- [x] ChatGPT
-- [ ] Bing
-- [ ] Bard
+bot.NewBot
+```go
+// bingunofficial.BingConfig
+mybot := bot.NewBot(&bot.Config{
+	// chatgp config
+	Proxy: "", // http://10.0.0.13:3127 , socks5://10.0.0.13:3126
+	ChatGPT: bot.ChatGPTConf{
+		SecretKey: "your secret key", // your secret key
+	},
+	// bing config
+	BingUnofficialConfig: &bingunofficial.BingConfig{
+		Proxy:      "", // http://127.0.0.1:10809
+		CookiePath: "./data/bingCookie.json",
+	},
+})
 
+```
+
+bot.Ask
+
+```go
+// params.ChatGPT
+err := mybot.Ask(
+	context.Background(),
+	&params.AskParams{
+		ConversationId:    coversationId,
+		Prompt:            prompt,
+		Callback:          callback,
+		ChatEngine:        params.ChatGPT, // params.ChatGPT params.NewBingUnofficial
+		SystemRoleMessage: sysMessage,
+	},
+)
+```
 
 ## Star History
 

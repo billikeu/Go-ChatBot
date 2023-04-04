@@ -1,6 +1,7 @@
 package params
 
 const (
-	BotTypeChatGPT = "ChatGPT"
-	BotTypeBing    = "Bing"
+	ChatGPT           = "ChatGPT"
+	ChatGPTUnofficial = "ChatGPTUnofficial"
+	NewBingUnofficial = "NewBingUnofficial"
 )

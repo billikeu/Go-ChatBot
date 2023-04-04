@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	bingunofficial "github.com/billikeu/Go-ChatBot/bot/bingUnofficial"
 	"github.com/billikeu/Go-ChatBot/bot/params"
 
 	"github.com/billikeu/Go-ChatBot/bot"
@@ -24,9 +25,15 @@ var callback = func(params *params.CallParams, err error) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	mybot := bot.NewBot(&bot.Config{
-		Proxy: "", // socks5://10.0.0.13:3126 , http://10.0.0.13:3127
+		// chatgp config
+		Proxy: "", // http://10.0.0.13:3127 , socks5://10.0.0.13:3126
 		ChatGPT: bot.ChatGPTConf{
 			SecretKey: "your secret key", // your secret key
+		},
+		// bing config
+		BingUnofficialConfig: &bingunofficial.BingConfig{
+			Proxy:      "", // http://127.0.0.1:10809
+			CookiePath: "./data/bingCookie.json",
 		},
 	})
 	var coversationId string = "rq1p21s32as138zj7f9qrjv4b"
@@ -47,7 +54,7 @@ func main() {
 				ConversationId:    coversationId,
 				Prompt:            prompt,
 				Callback:          callback,
-				BotType:           params.BotTypeChatGPT,
+				ChatEngine:        params.ChatGPT, // params.ChatGPT params.NewBingUnofficial
 				SystemRoleMessage: sysMessage,
 			},
 		)

@@ -3,7 +3,7 @@ package params
 type AskParams struct {
 	ConversationId    string
 	Prompt            string
-	BotType           string
+	ChatEngine        string
 	SystemRoleMessage string
 	Callback          func(params *CallParams, err error)
 	Proxy             string // optional , If RefreshProxy is true, the proxy value will be used to refresh the proxy

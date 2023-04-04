@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 
+	bingunofficial "github.com/billikeu/Go-ChatBot/bot/bingUnofficial"
 	"github.com/billikeu/Go-ChatBot/bot/chatgpt"
+	chatgptunofficial "github.com/billikeu/Go-ChatBot/bot/chatgptUnofficial"
 	"github.com/billikeu/Go-ChatBot/bot/params"
 )
 
@@ -35,36 +37,40 @@ func (bot *Bot) GetConversation(askParams *params.AskParams) (Conversation, erro
 	if len(askParams.ConversationId) < 16 {
 		return nil, errors.New("session must more 16 letters")
 	}
-	if askParams.BotType == params.BotTypeChatGPT {
-		conversation := bot.chatgptConversations[askParams.ConversationId]
-		if conversation != nil {
-			return conversation, nil
-		}
+	conversation := bot.chatgptConversations[askParams.ConversationId]
+	if conversation != nil {
+		return conversation, nil
+	}
+	switch askParams.ChatEngine {
+	case params.ChatGPT:
 		conversation = chatgpt.NewChatGPTConversion(bot.config.ChatGPT.SecretKey)
 		err := conversation.SetProxy(bot.config.Proxy)
 		if err != nil {
 			return nil, err
 		}
-		conversation.SetBaseURL(bot.config.ChatGPT.BaseURL)
-		err = conversation.Init()
-		if err != nil {
-			return nil, err
-		}
-		if askParams.SystemRoleMessage != "" {
-			conversation.SetSystemMsg(askParams.SystemRoleMessage)
-		}
-		bot.chatgptConversations[askParams.ConversationId] = conversation
-		return conversation, nil
-	} else {
+	case params.ChatGPTUnofficial:
+		conversation = chatgptunofficial.NewChatGPTUnofficial()
+	case params.NewBingUnofficial:
+		conversation = bingunofficial.NewBingChatUnofficial(bot.config.BingUnofficialConfig)
+	default:
 		return nil, errors.New("unimplemented interface")
 	}
+	conversation.SetBaseURL(bot.config.ChatGPT.BaseURL)
+	err := conversation.Init()
+	if err != nil {
+		return nil, err
+	}
+	if askParams.SystemRoleMessage != "" {
+		conversation.SetSystemMsg(askParams.SystemRoleMessage)
+	}
+	bot.chatgptConversations[askParams.ConversationId] = conversation
+	return conversation, nil
 }
 
 func (bot *Bot) Ask(ctx context.Context, askParams *params.AskParams) error {
 	conversation, err := bot.GetConversation(askParams)
 	if err != nil {
 		return err
-
 	}
 	if askParams.RefreshProxy {
 		if err = conversation.RefreshProxy(askParams.Proxy); err != nil {
