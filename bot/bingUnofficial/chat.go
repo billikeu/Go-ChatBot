@@ -2,6 +2,7 @@ package bingunofficial
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -120,6 +121,22 @@ func (chat *BingChatUnofficial) RefreshProxy(proxy string) error {
 	return nil
 }
 
+// refresh cookies
 func (chat *BingChatUnofficial) RefreshSecretKey(secretKey string) error {
+	if chat.bconfig.CookiesJson == secretKey {
+		return nil
+	}
+	cookies := []map[string]interface{}{}
+	err := json.Unmarshal([]byte(secretKey), &cookies)
+	if err != nil {
+		return err
+	}
+	chat.client = edgegpt.NewChatBot(chat.bconfig.CookiePath, cookies, chat.bconfig.Proxy)
+	err = chat.client.Init()
+	if err != nil {
+		return err
+	}
+	chat.bconfig.CookiesJson = secretKey
+	chat.bconfig.Cookies = cookies
 	return nil
 }
