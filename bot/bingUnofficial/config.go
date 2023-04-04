@@ -1,7 +1,8 @@
 package bingunofficial
 
 type BingConfig struct {
-	Proxy      string
-	Cookies    []map[string]interface{}
-	CookiePath string
+	CookiesJson string
+	Proxy       string
+	Cookies     []map[string]interface{}
+	CookiePath  string
 }
