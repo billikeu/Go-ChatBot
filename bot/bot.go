@@ -19,6 +19,7 @@ type Conversation interface {
 	Ask(ctx context.Context, prompt string, callback func(params *params.CallParams, err error)) (err error)
 	RefreshProxy(proxy string) error
 	RefreshSecretKey(secretKey string) error
+	Engine() string
 }
 
 type Bot struct {
@@ -90,7 +91,7 @@ func (bot *Bot) Ask(ctx context.Context, askParams *params.AskParams) error {
 			return err
 		}
 	}
-	if askParams.RefreshSecretKey {
+	if askParams.RefreshSecretKey && askParams.ChatEngine == conversation.Engine() {
 		if err = conversation.RefreshSecretKey(askParams.SecretKey); err != nil {
 			return err
 		}

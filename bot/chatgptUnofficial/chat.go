@@ -42,3 +42,7 @@ func (chat *ChatGPTUnofficial) RefreshProxy(proxy string) error {
 func (chat *ChatGPTUnofficial) RefreshSecretKey(secretKey string) error {
 	return nil
 }
+
+func (chat *ChatGPTUnofficial) Engine() string {
+	return params.ChatGPTUnofficial
+}
