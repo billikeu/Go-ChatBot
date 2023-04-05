@@ -140,3 +140,7 @@ func (chat *BingChatUnofficial) RefreshSecretKey(secretKey string) error {
 	chat.bconfig.Cookies = cookies
 	return nil
 }
+
+func (chat *BingChatUnofficial) Engine() string {
+	return params.NewBingUnofficial
+}

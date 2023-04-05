@@ -221,3 +221,7 @@ func (chat *ChatGPTConversion) RefreshSecretKey(secretKey string) error {
 	chat.client = openai.NewClientWithConfig(chat.botConfig)
 	return nil
 }
+
+func (chat *ChatGPTConversion) Engine() string {
+	return params.ChatGPT
+}
