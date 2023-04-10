@@ -5,10 +5,14 @@ import (
 	"log"
 
 	bingunofficial "github.com/billikeu/Go-ChatBot/bot/bingUnofficial"
+	chatgptunofficial "github.com/billikeu/Go-ChatBot/bot/chatgptUnofficial"
 	"github.com/billikeu/Go-ChatBot/bot/params"
+	"github.com/billikeu/go-chatgpt/chatgptuno"
 
 	"github.com/billikeu/Go-ChatBot/bot"
 )
+
+var coversationId string = "rq1p21s32as138zj7f9qrjv4b"
 
 var callback = func(params *params.CallParams, err error) {
 	if params == nil {
@@ -17,9 +21,11 @@ var callback = func(params *params.CallParams, err error) {
 	if err != nil {
 		log.Println(params.MsgId, err)
 	}
+	coversationId = params.ConversationId
 	if params.Done {
-		log.Println("answer: ", params.Text)
+		log.Println("answer: ", coversationId, params.Text)
 	}
+
 }
 
 func main() {
@@ -31,12 +37,17 @@ func main() {
 			SecretKey: "your secret key", // your secret key
 		},
 		// bing config
-		BingUnofficialConfig: &bingunofficial.BingConfig{
+		BingUnofficial: &bingunofficial.BingConfig{
 			Proxy:      "", // http://127.0.0.1:10809
 			CookiePath: "./data/bingCookie.json",
 		},
+		ChatGPTUnofficial: &chatgptunofficial.Config{
+			Proxy:       "",
+			AccessToken: "",
+			ChatGPTUno:  &chatgptuno.ChatGPTUnoConfig{},
+		},
 	})
-	var coversationId string = "rq1p21s32as138zj7f9qrjv4b"
+
 	var sysMessage = `You are Go-ChatBot, a large language model trained by billikeu. Follow the user's instructions carefully. Respond using markdown.`
 	questions := []string{
 		`Give me a joke of no more than 20 characters, it must start with "he"`,
@@ -51,7 +62,7 @@ func main() {
 		err := mybot.Ask(
 			context.Background(),
 			&params.AskParams{
-				ConversationId:    coversationId,
+				ConversationId:    coversationId, // if chatgpt uno, the first conversion should be nil
 				Prompt:            prompt,
 				Callback:          callback,
 				ChatEngine:        params.ChatGPT, // params.ChatGPT params.NewBingUnofficial

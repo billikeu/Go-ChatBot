@@ -11,10 +11,12 @@ import (
 )
 
 type BingChatUnofficial struct {
-	client  *edgegpt.ChatBot
-	requst  *Request
-	bconfig *BingConfig
-	busy    chan struct{}
+	client         *edgegpt.ChatBot
+	requst         *Request
+	bconfig        *BingConfig
+	busy           chan struct{}
+	conversationId string
+	parentId       string
 }
 
 func NewBingChatUnofficial(bconfig *BingConfig) *BingChatUnofficial {
@@ -143,4 +145,20 @@ func (chat *BingChatUnofficial) RefreshSecretKey(secretKey string) error {
 
 func (chat *BingChatUnofficial) Engine() string {
 	return params.NewBingUnofficial
+}
+
+func (chat *BingChatUnofficial) GetConvId() string {
+	return chat.conversationId
+}
+
+func (chat *BingChatUnofficial) SetConvId(convId string) {
+	chat.conversationId = convId
+}
+
+func (chat *BingChatUnofficial) GetParentId() string {
+	return chat.parentId
+}
+
+func (chat *BingChatUnofficial) SetParentId(parentId string) {
+	chat.parentId = parentId
 }

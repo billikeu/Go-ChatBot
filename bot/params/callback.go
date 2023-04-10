@@ -1,13 +1,14 @@
 package params
 
 type CallParams struct {
-	MsgId      string
-	ParentId   string
-	Chunk      string
-	Text       string
-	Done       bool
-	Model      string
-	ChunkIndex int
+	ConversationId string
+	MsgId          string // message id: chatgptuno id,
+	ParentId       string
+	Chunk          string
+	Text           string
+	Done           bool
+	Model          string
+	ChunkIndex     int
 }
 
 // create params for ask callback
@@ -25,4 +26,8 @@ func NewCallParams(msgId, parentId, chunk, text, model string, done bool, chunkI
 		ChunkIndex: chunkIndex,
 	}
 	return p
+}
+
+func (p *CallParams) SetConversationId(convId string) {
+	p.ConversationId = convId
 }

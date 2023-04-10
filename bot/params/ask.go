@@ -2,6 +2,7 @@ package params
 
 type AskParams struct {
 	ConversationId    string
+	ParentId          string
 	Prompt            string
 	ChatEngine        string
 	SystemRoleMessage string

@@ -20,6 +20,10 @@ type Conversation interface {
 	RefreshProxy(proxy string) error
 	RefreshSecretKey(secretKey string) error
 	Engine() string
+	GetConvId() string
+	SetConvId(convId string)
+	GetParentId() string
+	SetParentId(parentId string)
 }
 
 type Bot struct {
@@ -51,10 +55,10 @@ func (bot *Bot) GetConversation(askParams *params.AskParams) (Conversation, erro
 			return nil, err
 		}
 	case params.ChatGPTUnofficial:
-		conversation = chatgptunofficial.NewChatGPTUnofficial()
+		conversation = chatgptunofficial.NewChatGPTUnofficial(bot.config.ChatGPTUnofficial)
 	case params.NewBingUnofficial:
 		if askParams.RefreshProxy {
-			bot.config.BingUnofficialConfig.Proxy = askParams.Proxy
+			bot.config.BingUnofficial.Proxy = askParams.Proxy
 		}
 		if askParams.RefreshSecretKey {
 			cookies := []map[string]interface{}{}
@@ -62,10 +66,10 @@ func (bot *Bot) GetConversation(askParams *params.AskParams) (Conversation, erro
 			if err != nil {
 				return nil, err
 			}
-			bot.config.BingUnofficialConfig.CookiesJson = askParams.SecretKey
-			bot.config.BingUnofficialConfig.Cookies = cookies
+			bot.config.BingUnofficial.CookiesJson = askParams.SecretKey
+			bot.config.BingUnofficial.Cookies = cookies
 		}
-		conversation = bingunofficial.NewBingChatUnofficial(bot.config.BingUnofficialConfig)
+		conversation = bingunofficial.NewBingChatUnofficial(bot.config.BingUnofficial)
 	default:
 		return nil, errors.New("unimplemented interface")
 	}
@@ -96,9 +100,16 @@ func (bot *Bot) Ask(ctx context.Context, askParams *params.AskParams) error {
 			return err
 		}
 	}
+	conversation.SetConvId(askParams.ConversationId)
+	conversation.SetParentId(askParams.ParentId)
 	err = conversation.Ask(ctx, askParams.Prompt, askParams.Callback)
 	if err != nil {
 		return err
+	}
+	// update conversion map
+	if conversation.GetConvId() != askParams.ConversationId {
+		bot.chatgptConversations[conversation.GetConvId()] = conversation
+		delete(bot.chatgptConversations, askParams.ConversationId)
 	}
 	return nil
 }

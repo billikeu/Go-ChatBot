@@ -18,12 +18,14 @@ import (
 )
 
 type ChatGPTConversion struct {
-	secretKey string //openai api
-	botConfig openai.ClientConfig
-	client    *openai.Client
-	requst    *Request
-	busy      chan struct{}
-	proxy     string
+	secretKey      string //openai api
+	botConfig      openai.ClientConfig
+	client         *openai.Client
+	requst         *Request
+	busy           chan struct{}
+	proxy          string
+	conversationId string
+	parentId       string
 }
 
 func NewChatGPTConversion(secretKey string) *ChatGPTConversion {
@@ -224,4 +226,20 @@ func (chat *ChatGPTConversion) RefreshSecretKey(secretKey string) error {
 
 func (chat *ChatGPTConversion) Engine() string {
 	return params.ChatGPT
+}
+
+func (chat *ChatGPTConversion) GetConvId() string {
+	return chat.conversationId
+}
+
+func (chat *ChatGPTConversion) SetConvId(convId string) {
+	chat.conversationId = convId
+}
+
+func (chat *ChatGPTConversion) GetParentId() string {
+	return chat.parentId
+}
+
+func (chat *ChatGPTConversion) SetParentId(parentId string) {
+	chat.parentId = parentId
 }
